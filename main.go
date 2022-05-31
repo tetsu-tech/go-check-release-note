@@ -61,17 +61,22 @@ func getUrlsByWord(url string, word string) []string {
 		if title == word {
 			val, exists := s.Attr("href")
 			if exists {
-				fmt.Println(val)
+				urls = append(urls, val)
 			}
-			urls = append(urls, val)
 		}
 	})
 
 	return urls
 }
 
-func visitUrl(url string, word string) {
+func visitUrl(url string, searchWord string) {
 	document := getDocumentByUrl(url)
 
-	fmt.Println(url, strings.Contains(document.Text(), word))
+	document.Find("#main").Find("ul").Find("li").Each(func(i int, s *goquery.Selection) {
+		title := s.Text()
+		isContain := strings.Contains(title, searchWord)
+		if isContain {
+			fmt.Println(isContain, title)
+		}
+	})
 }
