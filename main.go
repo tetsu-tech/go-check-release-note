@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"sync"
 
 	"golang.org/x/net/html/charset"
 
@@ -19,10 +20,21 @@ func main() {
 
 	urls := getUrlsByWord(url, "Release notes")
 
+	var wg sync.WaitGroup
+
 	// それぞれのurlをvisitする
 	for _, v := range urls {
-		visitUrl(v, searchWord)
+
+		wg.Add(1)
+
+		url := v
+		go func() {
+			defer wg.Done()
+			visitUrl(url, searchWord)
+		}()
 	}
+
+	wg.Wait()
 }
 
 func getDocumentByUrl(url string) *goquery.Document {
